@@ -3,15 +3,13 @@
 namespace Classes;
 
 use PHPMailer\PHPMailer\PHPMailer;
-use SplSubject;
 
-class Email
-{
+class Email {
 
-    protected $email;
-    protected $nombre;
-    protected $token;
-
+    public $email;
+    public $nombre;
+    public $token;
+    
     public function __construct($email, $nombre, $token)
     {
         $this->email = $email;
@@ -19,67 +17,64 @@ class Email
         $this->token = $token;
     }
 
+    public function enviarConfirmacion() {
 
+         // create a new object
+         $mail = new PHPMailer();
+         $mail->isSMTP();
+         $mail->Host = $_ENV['EMAIL_HOST'];
+         $mail->SMTPAuth = true;
+         $mail->Port = $_ENV['EMAIL_PORT'];
+         $mail->Username = $_ENV['EMAIL_USER'];
+         $mail->Password = $_ENV['EMAIL_PASS'];
+     
+         $mail->setFrom('cuentas@devwebcamp.com');
+         $mail->addAddress($this->email, $this->nombre);
+         $mail->Subject = 'Confirma tu Cuenta';
 
-    public function enviarConfirmacion()
-    {
+         // Set HTML
+         $mail->isHTML(TRUE);
+         $mail->CharSet = 'UTF-8';
 
-        $mail = new PHPMailer();
-        $mail->isSMTP();
-        $mail->Host = 'sandbox.smtp.mailtrap.io';
-        $mail->SMTPAuth = true;
-        $mail->Port = 2525;
-        $mail->Username = '025cb332803d19';
-        $mail->Password = '6a3a0948e42892';
+         $contenido = '<html>';
+         $contenido .= "<p><strong>Hola " . $this->nombre .  "</strong> Has Registrado Correctamente tu cuenta en DevWebCamp; pero es necesario confirmarla</p>";
+         $contenido .= "<p>Presiona aquí: <a href='" . $_ENV['HOST'] . "/confirmar-cuenta?token=" . $this->token . "'>Confirmar Cuenta</a>";       
+         $contenido .= "<p>Si tu no creaste esta cuenta; puedes ignorar el mensaje</p>";
+         $contenido .= '</html>';
+         $mail->Body = $contenido;
 
-        $mail->setFrom('cuentas@uptask.com');
-        $mail->addAddress('cuentas@uptask.com', 'uptask.com');
-        $mail->Subject = 'Confirma tu Cuenta';
+         //Enviar el mail
+         $mail->send();
 
-        $mail->isHTML(true);
-        $mail->CharSet = 'UTF-8';
-
-        $contenido = '<html>';
-        $contenido .= "<p><strong>Hola " . $this->nombre . "</strong> Has creado tu cuenta en Uptask, solo debes confimarla en el siguente enlace.</p>";
-        $contenido .= "<p>Haz click en este enlace: <a href='http://localhost:8000/confirmar?token=" . $this->token . "'>Confirmar Cuenta</a></p>";
-        $contenido .= "<p>Si tu no solicitaste este mensaje puedes ignorarlo.</p>";
-        $contenido .= '</html>';
-
-        $mail->Body = $contenido;
-
-        //Enviar mail
-
-        $mail->send();
     }
 
-    public function enviarInstrucciones()
-    {
+    public function enviarInstrucciones() {
 
+        // create a new object
         $mail = new PHPMailer();
         $mail->isSMTP();
-        $mail->Host = 'sandbox.smtp.mailtrap.io';
+        $mail->Host = $_ENV['EMAIL_HOST'];
         $mail->SMTPAuth = true;
-        $mail->Port = 2525;
-        $mail->Username = '025cb332803d19';
-        $mail->Password = '6a3a0948e42892';
+        $mail->Port = $_ENV['EMAIL_PORT'];
+        $mail->Username = $_ENV['EMAIL_USER'];
+        $mail->Password = $_ENV['EMAIL_PASS'];
+    
+        $mail->setFrom('cuentas@appsalonfs.com');
+        $mail->addAddress($this->email, $this->nombre);
+        $mail->Subject = 'Reestablece tu password';
 
-        $mail->setFrom('cuentas@uptask.com');
-        $mail->addAddress('cuentas@uptask.com', 'uptask.com');
-        $mail->Subject = 'Reestablece tu Password';
-
-        $mail->isHTML(true);
+        // Set HTML
+        $mail->isHTML(TRUE);
         $mail->CharSet = 'UTF-8';
 
         $contenido = '<html>';
-        $contenido .= "<p><strong>Hola " . $this->nombre . "</strong> Si olvidaste tu password abajo estan las instrucciones para reestablecerla</p>";
-        $contenido .= "<p>Haz click en este enlace: <a href='http://localhost:8000/reestablecer?token=" . $this->token . "'>Reestablecer Password</a></p>";
-        $contenido .= "<p>Si tu no solicitaste este mensaje puedes ignorarlo.</p>";
+        $contenido .= "<p><strong>Hola " . $this->nombre .  "</strong> Has solicitado reestablecer tu password, sigue el siguiente enlace para hacerlo.</p>";
+        $contenido .= "<p>Presiona aquí: <a href='" . $_ENV['HOST'] . "/reestablecer?token=" . $this->token . "'>Reestablecer Password</a>";        
+        $contenido .= "<p>Si tu no solicitaste este cambio, puedes ignorar el mensaje</p>";
         $contenido .= '</html>';
-
         $mail->Body = $contenido;
 
-        //Enviar mail
-
+        //Enviar el mail
         $mail->send();
     }
 }
